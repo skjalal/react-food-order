@@ -98,6 +98,10 @@ type OrderRequest = {
   order: Order;
 };
 
+type FormState = {
+  id?: string;
+};
+
 export type {
   Meal,
   MealItemProps,
@@ -114,4 +118,5 @@ export type {
   ErrorPageProps,
   Customer,
   OrderRequest,
+  FormState,
 };

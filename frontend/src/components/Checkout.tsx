@@ -1,4 +1,4 @@
-import React, { type JSX } from "react";
+import React, { type JSX, useActionState } from "react";
 import Modal from "./UI/Modal.tsx";
 import { useCart } from "../store/CartContext.tsx";
 import Input from "./UI/Input.tsx";
@@ -6,7 +6,11 @@ import Button from "./UI/Button.tsx";
 import { useUserProgress } from "../store/UserProgressContext.tsx";
 import { useHttp } from "../hooks/useHttp.ts";
 import { currencyFormatter } from "../util/formatting.ts";
-import type { Customer, GenericApiResponse } from "../util/data-types.ts";
+import type {
+  Customer,
+  GenericApiResponse,
+  FormState,
+} from "../util/data-types.ts";
 import ErrorPage from "./ErrorPage.tsx";
 
 const requestConfig: RequestInit = {
@@ -20,13 +24,7 @@ const Checkout: React.FC = () => {
 
   const { progress, hideCheckout } = useUserProgress();
 
-  const {
-    data,
-    isLoading: isSending,
-    error,
-    sendRequest,
-    clearData,
-  } = useHttp<GenericApiResponse>(
+  const { data, error, sendRequest, clearData } = useHttp<GenericApiResponse>(
     "http://localhost:3000/orders",
     {},
     requestConfig
@@ -43,7 +41,10 @@ const Checkout: React.FC = () => {
     clearData();
   };
 
-  const checkoutAction = async (fd: FormData): Promise<void> => {
+  const checkoutAction = async (
+    state: FormState,
+    fd: FormData
+  ): Promise<FormState> => {
     const customerData = Object.fromEntries(fd.entries()) as Customer;
 
     await sendRequest({
@@ -52,7 +53,13 @@ const Checkout: React.FC = () => {
         customer: customerData,
       },
     });
+    return state;
   };
+
+  const [formState, formAction, isSending] = useActionState<
+    FormState,
+    FormData
+  >(checkoutAction, {});
 
   let actions: JSX.Element = (
     <>
@@ -65,6 +72,7 @@ const Checkout: React.FC = () => {
 
   if (isSending) {
     actions = <span>Sending order data...</span>;
+    console.log(formState);
   }
 
   if (data.message && error === "") {
@@ -93,7 +101,7 @@ const Checkout: React.FC = () => {
       open={progress === "checkout"}
       onClose={progress === "checkout" ? hideCheckout : undefined}
     >
-      <form action={checkoutAction}>
+      <form action={formAction}>
         <h2>Checkout</h2>
         <p>Total Amount: {currencyFormatter.format(cartTotal)}</p>
         <Input label="Full Name" id="name" type="text" />

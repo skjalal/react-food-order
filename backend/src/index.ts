@@ -20,6 +20,7 @@ app.get("/meals", async (_req: Request, res: Response) => {
 app.post("/orders", async (req: Request, res: Response) => {
   const { order: orderData } = req.body;
 
+  await new Promise((resolve) => setTimeout(resolve, 1000));
   if (
     orderData === null ||
     orderData.items === null ||
