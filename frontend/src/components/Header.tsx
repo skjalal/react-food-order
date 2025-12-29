@@ -2,8 +2,16 @@ import React from "react";
 
 import Button from "./UI/Button.tsx";
 import logoImg from "../assets/logo.jpg";
+import { useCart } from "../store/CartContext.tsx";
+import { useUserProgress } from "../store/UserProgressContext.tsx";
 
 const Header: React.FC = () => {
+  const { items } = useCart();
+  const { showCart } = useUserProgress();
+  const totalCartItems = items.reduce(
+    (totalNumberOfItems, item) => totalNumberOfItems + item.quantity!,
+    0
+  );
   return (
     <header id="main-header">
       <div id="title">
@@ -11,7 +19,9 @@ const Header: React.FC = () => {
         <h1>React Food</h1>
       </div>
       <nav>
-        <Button textOnly>Cart (0)</Button>
+        <Button onClick={showCart} textOnly>
+          Cart ({totalCartItems})
+        </Button>
       </nav>
     </header>
   );

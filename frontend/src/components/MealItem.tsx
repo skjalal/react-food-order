@@ -3,8 +3,14 @@ import React from "react";
 import Button from "./UI/Button.tsx";
 import { currencyFormatter } from "../util/formatting.ts";
 import type { MealItemProps } from "../util/data-types.ts";
+import { useCart } from "../store/CartContext.tsx";
 
 const MealItem: React.FC<MealItemProps> = ({ meal }) => {
+  const { addItem } = useCart();
+  const handleAddMealToCart = (): void => {
+    addItem(meal);
+  };
+
   const { id, name, image, price, description } = meal;
   const imagePath = "http://localhost:3000/" + image;
   const priceValue = currencyFormatter.format(+price);
@@ -18,7 +24,9 @@ const MealItem: React.FC<MealItemProps> = ({ meal }) => {
           <p className="meal-item-description">{description}</p>
         </div>
         <p className="meal-item-actions">
-          <Button textOnly={false}>Add to Cart</Button>
+          <Button onClick={handleAddMealToCart} textOnly={false}>
+            Add to Cart
+          </Button>
         </p>
       </article>
     </li>
