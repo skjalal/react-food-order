@@ -43,14 +43,10 @@ const Checkout: React.FC = () => {
     clearData();
   };
 
-  const handleSubmit = async (
-    event: React.FormEvent<HTMLFormElement>
-  ): Promise<void> => {
-    event.preventDefault();
-    const fd = new FormData(event.currentTarget);
+  const checkoutAction = async (fd: FormData): Promise<void> => {
     const customerData = Object.fromEntries(fd.entries()) as Customer;
 
-    sendRequest({
+    await sendRequest({
       order: {
         items,
         customer: customerData,
@@ -97,7 +93,7 @@ const Checkout: React.FC = () => {
       open={progress === "checkout"}
       onClose={progress === "checkout" ? hideCheckout : undefined}
     >
-      <form onSubmit={handleSubmit}>
+      <form action={checkoutAction}>
         <h2>Checkout</h2>
         <p>Total Amount: {currencyFormatter.format(cartTotal)}</p>
         <Input label="Full Name" id="name" type="text" />
